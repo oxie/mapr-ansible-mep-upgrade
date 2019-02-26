@@ -1,0 +1,4 @@
+mapr_mysql_user: mapr
+mapr_mysql_password: mapr
+mapr_user: mapr
+mapr_password: mapr

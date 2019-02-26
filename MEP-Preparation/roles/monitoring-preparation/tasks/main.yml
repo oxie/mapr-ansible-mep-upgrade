@@ -1,0 +1,114 @@
+- name: "Register CollectD Node Address"
+  shell: sudo su mapr -c 'maprcli node list -filter csvc=="collectd" -json | jq -r .data[].hostname'
+  register: collectd_url
+  run_once: true
+  ignore_errors: yes
+
+- name: "Register Grafana Node Address"
+  shell: sudo su mapr -c 'maprcli node list -filter csvc=="grafana" -json | jq -r .data[].hostname'
+  register: grafana_url
+  run_once: true
+  ignore_errors: yes
+
+- name: "Register Elastic-Search Node Address"
+  shell: sudo su mapr -c 'maprcli node list -filter csvc=="elasticsearch" -json | jq -r .data[].hostname'
+  register: elasticsearch_url
+  run_once: true
+  ignore_errors: yes
+
+- name: "Register FluentD Node Address"
+  shell: sudo su mapr -c 'maprcli node list -filter csvc=="fluentd" -json | jq -r .data[].hostname'
+  register: fluentd_url
+  run_once: true
+  ignore_errors: yes
+
+- name: "Register Kibana Node Address"
+  shell: sudo su mapr -c 'maprcli node list -filter csvc=="kibana" -json | jq -r .data[].hostname'
+  register: kibana_url
+  run_once: true
+  ignore_errors: yes
+
+- name: "Creating Required Directory Structure"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner:  
+    group:  
+    mode: 0775
+  with_items:
+    - /home/ /MEP-preparation/monitoring-tools/
+    - /home/ /MEP-preparation/monitoring-tools/collectd/
+    - /home/ /MEP-preparation/monitoring-tools/grafana/
+    - /home/ /MEP-preparation/monitoring-tools/elasticsearch/
+    - /home/ /MEP-preparation/monitoring-tools/fluentd/
+    - /home/ /MEP-preparation/monitoring-tools/kibana/
+  when:
+    -  inventory_hostname == collectd_url.stdout
+    -  inventory_hostname == grafana_url.stdout
+    -  inventory_hostname == elasticsearch_url.stdout
+    -  inventory_hostname == fluentd_url.stdout
+    -  inventory_hostname == kibana_url.stdout
+
+- name: "Copy Configuration files of collectd /conf/ directory"
+  shell: "cp -ar {{ item }}  /home/ /MEP-preparation/monitoring-tools/collectd/"
+  with_items:
+    - /opt/mapr/conf/conf.d/warden.collectd.conf
+    - /opt/mapr/collectd/*/etc/collectd.conf
+    - /etc/logrotate.d/collectd
+  when: inventory_hostname == collectd_url.stdout
+  ignore_errors: yes
+
+- name: "Copy Configuration files of Grafana /conf/ directory"
+  shell: "cp -ar {{ item }}  /home/ /MEP-preparation/monitoring-tools/grafana/"
+  with_items:
+    - /opt/mapr/conf/conf.d/warden.grafana.conf
+    - /opt/mapr/grafana/grafana*/etc/grafana/grafana.ini
+    - /opt/mapr/grafana/grafana*/etc/grafana/grafana.ini
+  when: inventory_hostname == grafana_url.stdout
+  ignore_errors: yes
+
+- name: "Copy Configuration files of Elastic-Search /conf/ directory"
+  shell: "cp -ar {{ item }}  /home/ /MEP-preparation/monitoring-tools/elasticsearch/"
+  with_items:
+    - /opt/mapr/conf/conf.d/warden.elasticsearch.conf
+    - /opt/mapr/elasticsearch/elasticsearch*/etc/elasticsearch/elasticsearch.yml
+    - /opt/mapr/elasticsearch/elasticsearch*/etc/elasticsearch/logging.yml
+    - /opt/mapr/elasticsearch/elasticsearch*/etc/elasticsearch/curator.yml
+    - /opt/mapr/elasticsearch/elasticsearch*/etc/elasticsearch/curator_actions/delete_indices.yml
+  when: inventory_hostname == elasticsearch_url.stdout
+  ignore_errors: yes
+
+- name: "Copy Configuration files of Kibana /conf/ directory"
+  shell: "cp -ar {{ item }}  /home/ /MEP-preparation/monitoring-tools/kibana/"
+  with_items:
+    - /opt/mapr/conf/conf.d/warden.kibana.conf
+    - /opt/mapr/kibana/kibana*/etc/conf/kibana.js
+  when: inventory_hostname == kibana_url.stdout
+  ignore_errors: yes
+
+- name: "Copy Configuration files of FluentD /conf/ directory"
+  shell: "cp -ar {{ item }}  /home/ /MEP-preparation/monitoring-tools/fluentd/"
+  with_items:
+    - /opt/mapr/conf/conf.d/warden.fluentd.conf
+    - /opt/mapr/fluentd/fluentd-<version>/etc/fluentd/fluentd.conf
+    - /opt/mapr/fluentd/fluentd-<version>/etc/fluentd/es_config.conf
+    - /opt/mapr/fluentd/fluentd-<version>/etc/fluentd/maprfs_config.conf
+    - /opt/mapr/fluentd/fluentd-<version>/etc/fluentd/grok-patterns
+    - /etc/logrotate/fluentd
+  when: inventory_hostname == fluentd_url.stdout
+  ignore_errors: yes
+
+- name: "Stop Services of Collectd, Grafana, Kibana, fluentd, Elastic-search"
+  shell: 'sudo su mapr -c "maprcli node services -name oozie -action stop -filter csvc=="{{ item }}""'
+  with_items:
+    - collectd
+    - grafana
+    - kibana
+    - fluentd
+    - elasticsearch
+  when:
+    -  inventory_hostname == collectd_url.stdout
+    -  inventory_hostname == grafana_url.stdout
+    -  inventory_hostname == elasticsearch_url.stdout
+    -  inventory_hostname == fluentd_url.stdout
+    -  inventory_hostname == kibana_url.stdout

@@ -1,0 +1,9 @@
+# Install Apache Drill Standalone
+
+# Redhat / CentOS
+- name: Install mapr-drill (Redhat / CentOS)
+  yum:
+    name: mapr-drill
+    state: latest
+  when:
+    - ansible_os_family == 'RedHat'

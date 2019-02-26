@@ -1,0 +1,20 @@
+- name: "Register Oozie Node Address"
+  shell: sudo su mapr -c 'maprcli node list -filter csvc=="oozie" -json | jq -r .data[].hostname'
+  register: oozie_url
+  run_once: true
+
+- name: Upgrade Oozie-Internal
+  yum:
+    name: mapr-oozie-internal
+    state: latest
+  when:
+    - ansible_os_family == 'RedHat'
+    - inventory_hostname == oozie_url.stdout
+
+- name: Upgrade Oozie
+  yum:
+    name: mapr-oozie
+    state: latest
+  when:
+    - ansible_os_family == 'RedHat'
+    - inventory_hostname == oozie_url.stdout

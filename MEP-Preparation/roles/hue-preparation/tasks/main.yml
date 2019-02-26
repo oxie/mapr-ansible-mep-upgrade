@@ -1,0 +1,17 @@
+- name: "Creating Required Directory Structure"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner:  
+    group:  
+    mode: 0775
+  with_items:
+    - /home/ /MEP-preparation/hue/
+    - /home/ /MEP-preparation/hue/conf/
+    - /home/ /MEP-preparation/hue/db_bak/
+
+- name: "Copy configuration files to /home/ /MEP-preparation/hue/"
+  shell: "cp -ar /opt/mapr/hue/*/desktop/conf/* /home/ /MEP-preparation/hue/conf/"
+
+- name: "Dump the database from /opt/mapr/hue/<version>/desktop/desktop.db"
+  shell: "sqlite3 /opt/mapr/hue/*/desktop/*.db .dump > /home/ /MEP-preparation/hue/db_bak/hue-dump-sqlite.bak"

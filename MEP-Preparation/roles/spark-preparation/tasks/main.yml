@@ -1,0 +1,13 @@
+- name: "Creating Required Directory Structure - for Spark on Yarn"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner:  
+    group:  
+    mode: 0775
+  with_items:
+    - /home/ /MEP-preparation/spark/
+
+
+- name: "Copy Configuration files to /home/ /MEP-preparation/spark/"
+  shell: "cp -ar /opt/mapr/spark/*/conf/* /home/ /MEP-preparation/spark/"

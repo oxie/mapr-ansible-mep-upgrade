@@ -1,0 +1,22 @@
+- name: "Creating Required Directory Structure"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner:  
+    group:  
+    mode: 0775
+  with_items:
+    - /home/ /MEP-preparation/hive/
+    - /home/ /MEP-preparation/hive/mysql_bak/
+    - /home/ /MEP-preparation/hive/conf/
+
+- name: "Copy Configuration files of hbase /conf/ directory"
+  shell: "cp -ar /opt/mapr/hive/*/conf/*  /home/ /MEP-preparation/hive/conf/"
+
+- name: "Registering MYSQL host from the hive-site.xml"
+  shell: "cat /opt/mapr/hive/*/conf/hive-site.xml | grep jdbc:mysql | cut -f3 -d: | cut -f3 -d/"
+  register: mysql_url
+
+- name: "Backup MysqlDB to /home/mapr/MEP-preparation/hive/mysql_bak/"
+  shell: "mysqldump -u {{mapr_mysql_user}} -p{{mapr_mysql_password}} -h {{mysql_url.stdout}}  hive -r /home/ /MEP-preparation/hive/mysql_bak/hive_bak.sql"
+  when: inventory_hostname == mysql_url.stdout

@@ -1,0 +1,8 @@
+mapr_release_url: http://package.mapr.com/releases/v5.2.0
+mapr_ecosystem_url: http://package.mapr.com/releases/MEP/MEP-3.0/
+mapr_gpg_url: http://package.mapr.com/releases/pub/maprgpg.key
+
+mapr_mysql_user: mapr
+mapr_mysql_password: mapr
+mapr_user: mapr
+mapr_password: mapr

@@ -1,0 +1,16 @@
+- name: MEP-UPGRADE UPGRADE PREPARATION
+  hosts: preparation-hosts
+#  strategy: debug
+  roles:
+#     - dependencies
+#     - drill-preparation
+#     - hbase-preparation
+#     - hive-preparation
+#     - httpfs-preparation
+#     - hue-preparation
+#     - oozie-preparation
+#     - spark-preparation
+     - monitoring-preparation
+#     - stop-services
+#     - fetch-backups
+#     - start-services

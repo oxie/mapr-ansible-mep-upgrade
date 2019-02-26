@@ -1,0 +1,15 @@
+- name: MEP-UPGRADE UPGRADE PREPARATION
+  hosts: upgrade-hosts
+#  strategy: debug
+  roles:
+#     - preparation
+#     - drill-upgrade
+#     - hbase-upgrade
+#     - hive-upgrade
+#     - httpfs-upgrade
+#     - spark-upgrade
+# Spark must be before hue because its dependancy
+#     - hue-upgrade
+#     - oozie-upgrade
+#     - kafka-upgrade
+#     - mapr-python-streams ( This seems to be failing and not needed, to be reviewed ) 

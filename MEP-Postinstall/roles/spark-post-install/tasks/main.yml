@@ -1,0 +1,58 @@
+- name: "Register Current Hive version"
+  shell: "ls -la /opt/mapr/hive/hive-*/ -d | awk '{ printf $9 }' | cut -f2 -d- | cut -f1 -d/"
+  register: hive_version
+  run_once: true
+
+- name: "Register Current Spark version"
+  shell: "ls -la /opt/mapr/spark/spark-*/ -d | awk '{ printf $9 }' | cut -f2 -d- | cut -f1 -d/"
+  register: spark_version
+  run_once: true
+
+#- name: "Register NFS Node Address"
+#  shell: sudo su mapr -c 'maprcli node list -filter csvc=="nfs" -json | jq -r .data[].hostname'
+#  register: nfs_url
+#  run_once: true
+
+#- name: "Copy back configuration files to /conf directory"
+#  shell: "cp -afr /home/ /MEP-preparation/spark/* /opt/mapr/spark/*/conf/"
+
+#- name: "For Spark on Yarn that uses the maprfs we need to copy the jar"
+#  shell: "cp -afr /opt/mapr/spark/spark-*/lib/spark-assembly-*.jar {{ item }}"
+#  with_items:
+#    - /mapr/*/apps/
+#    - /mapr/*/apps/spark/
+#  run_once: true
+#  when: inventory_hostname == nfs_url.stdout
+
+#- name: "Copy of Hive-Site.xml for spark to work with hive"
+#  shell: "cp -af /opt/mapr/hive/hive-*/conf/hive-site.xml /opt/mapr/spark/spark-*/conf/"
+#  ignore_errors: yes
+
+
+- name: Configure spark-defaults.conf - hive version
+  run_once: true
+  replace:
+    path: /home/vpetrov/spark-defaults.conf
+    regexp: >-
+             hive-(\d+\.)(\d+)
+    replace: >-
+             hive-{{hive_version.stdout}}
+    backup: yes
+
+- name: Configure spark-defaults.conf - spark version
+  run_once: true
+  replace:
+    path: /home/vpetrov/spark-defaults.conf
+    regexp: >-
+             spark-(\d+\.)(\d+\.)(\d+)
+    replace: >-
+             spark-{{spark_version.stdout}}
+    backup: yes
+
+
+#- name: "Restart Spark-Historyserver Services across all nodes on cluster"
+#  shell: 'sudo su mapr -c "maprcli node services -name spark-historyserver -action restart -filter csvc=="spark-historyserver""'
+#  run_once: true
+
+#- name: "There is a step that we have to delete the old spark version directory"
+#  pause: prompt="IMPORTANT! - YOU HAVE TO DELETE THE OLD SPARK VERSION DIRECTORY MANUALLY (TBD)"

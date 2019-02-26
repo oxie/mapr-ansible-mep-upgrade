@@ -1,0 +1,6 @@
+[upgrade-hosts]
+xxxxxxxxxxxxxxx.net ansible_ssh_user=vpetrov ansible_become_method=su ansible_connection=ssh
+xxxxxxxxxxxxxxx.nett ansible_ssh_user=vpetrov ansible_become_method=su ansible_connection=ssh
+xxxxxxxxxxxxxxx.nett ansible_ssh_user=vpetrov ansible_become_method=su ansible_connection=ssh
+xxxxxxxxxxxxxxx.nett ansible_ssh_user=vpetrov ansible_become_method=su ansible_connection=ssh
+

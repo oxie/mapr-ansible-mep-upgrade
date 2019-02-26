@@ -1,0 +1,6 @@
+[post-install-hosts]
+mapr1-dev ansible_ssh_user=vpetrov ansible_become_method=su ansible_connection=ssh
+mapr2-dev ansible_ssh_user=vpetrov ansible_become_method=su ansible_connection=ssh
+mapr3-dev ansible_ssh_user=vpetrov ansible_become_method=su ansible_connection=ssh
+mapr4-dev ansible_ssh_user=vpetrov ansible_become_method=su ansible_connection=ssh
+

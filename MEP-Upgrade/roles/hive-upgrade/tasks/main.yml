@@ -1,0 +1,20 @@
+- name: Upgrade Mapr Hive (Redhat / CentOS)
+  yum:
+    name: mapr-hive
+    state: latest
+  when:
+    - ansible_os_family == 'RedHat'
+
+- name: Upgrade Mapr 1.Mapr-HiveServer2 and  2.Mapr-HiveMetastore
+  shell: "yum -y update {{ item }}"
+  with_items:
+    - mapr-hiveserver2
+    - mapr-hivemetastore
+  when:
+    - ansible_os_family == 'RedHat'
+
+#Copy Configuration Files from /opt/mapr/hbase/<version>/conf/
+- name: "Copy Configuration files of Hive to /conf/ directory"
+  shell: "cp -arf /home/mapr/MEP-preparation/hive/conf/* /opt/mapr/hive/*/conf/"
+  when:
+    - ansible_os_family == 'RedHat'

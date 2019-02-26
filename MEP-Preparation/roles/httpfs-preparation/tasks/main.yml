@@ -1,0 +1,35 @@
+- name: "Register Httpfs Node Address"
+  shell: sudo su mapr -c 'maprcli node list -filter csvc=="httpfs" -json | jq -r .data[].hostname'
+  register: httpfs_url
+  run_once: true
+
+- name: "Creating Required Directory Structure"
+  when: inventory_hostname == httpfs_url.stdout
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner:  
+    group:  
+    mode: 0775
+  with_items:
+    - /home/ /MEP-preparation/httpfs/
+    - /home/ /MEP-preparation/httpfs/tomcat/
+    - /home/ /MEP-preparation/httpfs/tomcat/conf/
+    - /home/ /MEP-preparation/httpfs/tomcat/webapps/
+    - /home/ /MEP-preparation/httpfs/etc/
+
+- name: "Copy Configuration files of hbase /conf/ directory"
+  shell: "cp -ar /opt/mapr/httpfs/*/share/hadoop/httpfs/tomcat/webapps/webhdfs/WEB-INF/web.xml  /home/ /MEP-preparation/httpfs/tomcat/webapps/"
+  when: inventory_hostname == httpfs_url.stdout
+
+- name: "Copy Configuration files of hbase /conf/ directory"
+  shell: "cp -ar /opt/mapr/httpfs/*/share/hadoop/httpfs/tomcat/conf/server.xml  /home/ /MEP-preparation/httpfs/tomcat/conf/"
+  when: inventory_hostname == httpfs_url.stdout
+
+- name: "Copy Configuration files of hbase /conf/ directory"
+  shell: "cp -ar /opt/mapr/httpfs/*/share/hadoop/httpfs/tomcat/conf/tomcat-users.xml  /home/ /MEP-preparation/httpfs/tomcat/conf/"
+  when: inventory_hostname == httpfs_url.stdout
+
+- name: "Copy Configuration files of hbase /conf/ directory"
+  shell: "cp -ar /opt/mapr/httpfs/*/etc/hadoop/httpfs-site.xml  /home/ /MEP-preparation/httpfs/etc/"
+  when: inventory_hostname == httpfs_url.stdout

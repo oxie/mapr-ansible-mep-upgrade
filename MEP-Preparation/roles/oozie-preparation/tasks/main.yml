@@ -1,0 +1,34 @@
+- name: "Creating Required Directory Structure"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner:  
+    group:  
+    mode: 0775
+  with_items:
+    - /home/ /MEP-preparation/oozie/
+
+
+- name: "Register Oozie Node Address"
+  shell: sudo su mapr -c 'maprcli node list -filter csvc=="oozie" -json | jq -r .data[].hostname'
+  register: oozie_url
+  run_once: true
+
+- name: "Register MFS Node Address"
+  shell: sudo su mapr -c 'maprcli node list -filter csvc=="nfs" -json | jq -r .data[].hostname'
+  register: nfs_url
+  run_once: true
+
+- name: "set facts"
+  set_fact:
+     url_nfs: "{{nfs_url.stdout}}"
+  run_once: true
+
+- name: "Setting facts"
+  set_fact:
+     url_oozie: "{{oozie_url.stdout}}"
+  run_once: true 
+
+- name: "Copy Configuration files of oozie /conf/ directory"
+  shell: "cp -a /opt/mapr/oozie/*/conf/  /home/ /MEP-preparation/oozie/"
+  when: inventory_hostname == oozie_url.stdout

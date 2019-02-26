@@ -1,0 +1,12 @@
+- name: "Upgrading HttpFS: - Remove old httpfs"
+  shell: "yum remove -y mapr-httpfs"
+
+- name: "Upgrading HttpFS: - Remove old httpfs leftover folder"
+  shell: "rm -rf /opt/mapr/httpfs/"
+
+- name: "Upgrade HttpFS: Installing new Mapr-HttpFS"
+  yum:
+    name: mapr-httpfs
+    state: latest
+  when:
+    - ansible_os_family == 'RedHat'

@@ -1,0 +1,22 @@
+- name: "Copy Backed-Up  Configuration files for  DRILL /conf/ directory"
+  shell: "cp -arf /home/MEP-preparation/drill/conf/* /opt/mapr/drill/*/conf/"
+
+- name: "Run configure.sh to refresh the node configuration"
+  shell: "/opt/mapr/server/configure.sh -R"
+
+- name: "Start Drill-Bit Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name drill-bits -action start -filter csvc=="drill-bits""'
+
+- name: "Getting Drill Plugin Configurations. Default plugins across the drill environments are - cp and dfs. Saving them to /home/MEP-Preparation/drill/{cp, dfs} "
+  shell: 'curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -k -c /home/MEP-preparation/drill/cookies.txt -s -d "j_username=mapr" -d "j_password=mapr" http://{{inventory_hostname}}:8047/j_security_check'
+
+- name: "We need to put the storage plugins back to DRILL"
+  shell: 'curl -b /home/MEP-preparation/drill/cookies.txt -k -H "Content-Type: application/json" -X POST -d @/home/MEP-preparation/dill/plugin-conf/{{ item }}.json http://{{ inventory_hostname }}:8047/storage/{{ item }}.json'
+  with_items:
+    - "dfs"
+    - "cp"
+    - "app"
+    - "hbase"
+
+- name: "Stop Drill-Bit Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name drill-bits -action stop -filter csvc=="drill-bits""'

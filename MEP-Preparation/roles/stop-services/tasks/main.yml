@@ -1,0 +1,59 @@
+# Start Upgraded HBASE-Thrift
+- name: "Start Updated HBASE-Thrift Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name hbasethrift -action stop -filter csvc=="hbasethrift""'
+  run_once: true
+
+# Start Upgraded HBASE-Rest
+- name: "Start Updated HBASE-Thrift Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name hbaserest -action stop -filter csvc=="hbaserest""'
+  run_once: true
+
+# STOP SPARK
+- name: "Stop Spark-HistoryServer Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name spark-historyserver -action stop -filter csvc=="spark-historyserver""'
+  run_once: true
+
+# STOP LIVY
+- name: "Stop Hue Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name hue -action stop -filter csvc=="hue""'
+  run_once: true
+
+# STOP HUE
+- name: "Stop Livy Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name livy -action stop -filter csvc=="livy""'
+  run_once: true
+
+# STOP HIVE SERVICE 
+- name: "Stop HiveMeta Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name hivemeta -action stop -filter csvc=="hivemeta""'
+  run_once: true
+
+# STOP DRILLBIT
+- name: "Stop Drill-Bit Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name drill-bits -action stop -filter csvc=="drill-bits""'
+  run_once: true
+
+- name: "Stop oozie from services"
+  shell: 'sudo su mapr -c "maprcli node services -name oozie -action stop -filter csvc=="oozie""'
+  when: inventory_hostname == url_oozie
+
+# OOZIE HAS TO BE STOPED OTHERWISE IT GENERATES ADDITIONAL LIBRARIES
+- name: "Delete old share libraries from maprfs:///oozie/share"
+  shell: "rm -rf /mapr/*/oozie/share/"
+  when: inventory_hostname == url_nfs
+
+- name: Stop MapR Warden
+  service:
+    name: mapr-warden
+    state: stopped
+    enabled: yes
+
+- name: Ansible Exceution is Paused for 1 minutes
+  pause:
+    minutes: 1
+
+- name: Stop Zookeeper
+  service:
+    name: mapr-zookeeper
+    state: stopped
+    enabled: yes

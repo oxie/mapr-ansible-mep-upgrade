@@ -1,0 +1,41 @@
+- name: "Copy back the configuration files of Hue"
+  shell: "cp -fa /home/ /MEP-preparation/hue/conf/* /opt/mapr/hue/*/desktop/conf/"
+
+- name: "After Hue updates we need to make a symlink to the Cyrus SASL library"
+  shell: "ln -s /lib64/libsasl2.so.3.0.0 /lib64/libsasl2.so.2"
+  ignore_errors: yes
+
+- name: "Update Database Schema"
+  shell: 'echo "hue syncdb --noinput"  | source /opt/mapr/hue/hue-*/build/env/bin/activate'
+
+- name: "Update Database Schema"
+  shell: 'echo "hue migrate --merge"  | source /opt/mapr/hue/hue-*/build/env/bin/activate'
+
+- name: "Update Database Schema"
+  shell: 'echo "deactivate"  | source /opt/mapr/hue/hue-*/build/env/bin/activate'
+
+- name: "Remove existing Hue plugins from the MapReduce lib directory"
+  shell: "rm -f /opt/mapr/hadoop/hadoop-0.20*/lib/hue-plugins-*.jar"
+
+- name: "Copy new Hue plugints to MapReduce lib directory"
+  shell: "cp /opt/mapr/hue/hue-*/desktop/libs/hadoop/java-lib/hue-plugins-*.jar /opt/mapr/hadoop/hadoop-0.20*/lib/"
+
+- name: "Restart Job Tracker Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name jobtracker -action restart -filter csvc=="jobtracker""'
+  run_once: true
+
+- name: "Run configure.sh -R"
+  shell: "/opt/mapr/server/configure.sh -R"
+
+- name: "Restart Hue Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name hue -action restart -filter csvc=="hue""'
+  run_once: true
+
+# NASKO TOLD ME TO SKIP THOSE AS HUE DB ISNT BEING UTILIZED AS SUGGESTED IN THE MEP POSTINSTALL
+#- name: "Backing up current new SQLITE3 DB"
+#  shell: "mv /opt/mapr/hue/hue-*/desktop/desktop.db /opt/mapr/hue/hue-*/desktop/desktop.db.old-bak"
+#
+#- name: "Import old SQLITE3 DB"
+#  shell: "sqlite3 /opt/mapr/hue/hue-*/desktop/desktop.db < /home/ /MEP-preparation/hue/db_bak/hue-dump-sqlite.bak"
+
+

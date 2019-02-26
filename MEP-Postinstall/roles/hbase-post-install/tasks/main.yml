@@ -1,0 +1,13 @@
+# Start Upgraded HBASE-Thrift
+- name: "Start Updated HBASE-Thrift Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name hbasethrift -action restart -filter csvc=="hbasethrift""'
+  run_once: true
+
+#Need to fix hbase version in warden.hbaserest.conf
+- name: "Fix version in /opr/mapr/conf/conf.d/warden.hbaserest.conf
+  shell: "sed -i s/\1.1.8/`cat /opt/mapr/hbase/hbaseversion`/g /opt/mapr/conf/conf.d/warden.hbaserest.conf"
+
+# Start Upgraded HBASE-Rest
+- name: "Start Updated HBASE-REST Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name hbaserest -action restart -filter csvc=="hbaserest""'
+  run_once: true

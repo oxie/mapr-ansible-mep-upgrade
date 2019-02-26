@@ -1,0 +1,45 @@
+#- name: "Renaming file"
+#  ignore_errors: true
+#  delay: 10
+#  shell: "mv /home/ /MEP-preparation/ /home/ /{{inventory_hostname}}/"
+  
+#- name: "setting ownerships"
+#  shell: "chown -R root:root /home/ /{{inventory_hostname}}/"
+
+#- name: "Preparing files for Fetching"
+#  delay: 225
+#  shell: "sudo su -   -c 'tar -zcf ~/{{ inventory_hostname }}.MEP-BAKUP.tar.gz ~/{{ inventory_hostname }}/'"
+
+#- name: waiting for a few seconds to let the machine start
+#  pause:
+#    seconds: 2
+
+
+#- name: "Registering Backups"
+#  find:
+#    paths: /home/ /
+#    patterns: "{{inventory_hostname}}.MEP-BAKUP.tar.gz"
+#    use_regex: True
+#  register: backup_file
+
+#- name: waiting for a few seconds to let the machine start
+#  pause:
+#    seconds: 2
+
+#- name: "Downaloding backup"
+#  delay: 10
+#  with_items: "{{ backup_file.files }}"
+#  fetch:
+#    src: "{{ item.path }}"
+#    dest: "/tmp/"
+#    flat: yes
+#    mode: 0774
+
+#- name: "Removing uneeded files"
+#  shell: "rm -rf /home/ /{{inventory_hostname}}.MEP-BAKUP.tar.gz"
+
+#- name: "Renaming for local storage on hosts"
+#  shell: "mv /home/ /{{inventory_hostname}}/ /home/ /MEP-preparation/"
+
+#- name: "Removing"
+#  shell: "rm -rf /home/ /{{inventory_hostname}}/"

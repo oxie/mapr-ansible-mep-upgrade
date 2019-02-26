@@ -1,0 +1,6 @@
+- name: Upgrade Kafka (Redhat / CentOS)
+  yum:
+    name: mapr-kafka
+    state: latest
+  when:
+    - ansible_os_family == 'RedHat'

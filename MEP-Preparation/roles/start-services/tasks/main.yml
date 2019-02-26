@@ -1,0 +1,45 @@
+- name: Start Zookeeper
+  service:
+    name: mapr-zookeeper
+    state: started
+    enabled: yes
+
+- name: Start MapR Warden
+  service:
+    name: mapr-warden
+    state: started
+    enabled: yes
+
+- name: Ansible Exceution is Paused for 1 minutes
+  pause:
+    minutes: 1
+
+# start SPARK
+- name: "start Spark-HistoryServer Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name spark-historyserver -action start -filter csvc=="spark-historyserver""'
+  run_once: true
+
+# start LIVY
+- name: "start Hue Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name hue -action start -filter csvc=="hue""'
+  run_once: true
+
+# start HUE
+- name: "start Livy Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name livy -action start -filter csvc=="livy""'
+  run_once: true
+
+# start HIVE SERVICE 
+- name: "start HiveMeta Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name hivemeta -action start -filter csvc=="hivemeta""'
+  run_once: true
+
+# start DRILLBIT
+- name: "start Drill-Bit Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name drill-bits -action start -filter csvc=="drill-bits""'
+  run_once: true
+
+# start OOZIE
+- name: "start Oozie Services across all nodes on cluster - {{url_oozie}}"
+  shell: 'sudo su mapr -c "maprcli node services -name oozie -action start -filter csvc=="oozie""'
+  when: inventory_hostname == url_oozie

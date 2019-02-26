@@ -1,0 +1,27 @@
+# Redhat / CentOS
+#- name: Upgrade Mapr Hbase (Redhat / CentOS)
+#  yum:
+#    name: mapr-hbase
+#    state: latest
+#  when:
+#    - ansible_os_family == 'RedHat'
+
+# Redhat / CentOS
+#- name: Upgrade Mapr Hbase (Redhat / CentOS)
+#  shell: "yum -y update {{ item }}"
+#  with_items:
+#    - mapr-hbase-regionserver
+#    - mapr-hbase-master
+#    - mapr-hbasethrift
+#    - mapr-hbase-rest
+#    - mapr-libhbase
+#  ignore_errors: yes
+#  when:
+#    - ansible_os_family == 'RedHat'
+
+#- name: "Migrate Back the Configuration setting files from /opt/mapr/hbase/hbase-<version>/conf/"
+#  shell: "cp -af /home/ /MEP-preparation/hbase/conf/* /opt/mapr/hbase/*/conf/"
+#  ignore_errors: yes
+
+#- name: "Run configure.sh -R on all of the upgraded HBase nodes"
+#  shell: "/opt/mapr/server/configure.sh -R"

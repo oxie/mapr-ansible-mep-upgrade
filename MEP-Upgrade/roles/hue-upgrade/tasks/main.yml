@@ -1,0 +1,14 @@
+- name: Upgrade Mapr Hue
+  yum:
+    name: mapr-hue
+    state: latest
+  when:
+    - ansible_os_family == 'RedHat'
+
+- name: Upgrade Mapr Hue-Livy
+  yum:
+    name: mapr-hue-livy
+    state: latest
+  when:
+    - ansible_os_family == 'RedHat'
+

@@ -1,0 +1,11 @@
+- name: MEP-UPGRADE POST-INSTALLATION
+  hosts: post-install-hosts
+#  strategy: debug
+  roles:
+#     - drill-post-install
+#     - hbase-post-install
+#     - hive-post-install
+#     - httpfs-post-install
+     - spark-post-install
+#     - hue-post-install
+#     - oozie-post-install

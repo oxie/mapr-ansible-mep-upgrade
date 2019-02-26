@@ -1,0 +1,24 @@
+- name: "Register Oozie Node Address"
+  shell: sudo su mapr -c 'maprcli node list -filter csvc=="oozie" -json | jq -r .data[].hostname'
+  register: oozie_url
+  run_once: true
+
+- name: "Copy Configuration files back to oozie /conf/ directory"
+  shell: "cp -af  /home/ /MEP-preparation/oozie/conf/* /opt/mapr/oozie/*/conf/"
+  when: inventory_hostname == oozie_url.stdout
+
+- name: "remove the old warden.oozie.conf under the /opt/mapr/conf/conf.d/ directory before running the configure.sh -R command"
+  shell: "rm -rf /opt/mapr/conf/conf.d/warden.oozie.conf"
+  when: inventory_hostname == oozie_url.stdout
+
+- name: "Run configure.sh -R"
+  shell: "/opt/mapr/server/configure.sh -R"
+  when: inventory_hostname == oozie_url.stdout
+
+- name: "Run the following command to upgrade the database schema"
+  shell: "/opt/mapr/oozie/oozie-*/bin/ooziedb.sh upgrade -run"
+  when: inventory_hostname == oozie_url.stdout
+
+- name: "Restart oozie from services"
+  shell: 'sudo su mapr -c "maprcli node services -name oozie -action restart -filter csvc=="oozie""'
+  when: inventory_hostname == url_oozie

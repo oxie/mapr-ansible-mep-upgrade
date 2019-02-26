@@ -1,0 +1,9 @@
+##PREREQUASITE INSTALL JQ TO GET SUCCESSFULLY HTTPFS STRING
+
+- name: "Install JQ to make actuall checks for the host"
+  yum:
+    name: jq
+    state: present
+
+- name: "Mapr Login"
+  shell: 'sudo su mapr -c "echo {{ mapr_password }} | maprlogin password -user {{ mapr_user }}"'

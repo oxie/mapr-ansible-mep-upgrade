@@ -1,0 +1,24 @@
+- name: "Register Httpfs Node Address"
+  shell: sudo su mapr -c 'maprcli node list -filter csvc=="httpfs" -json | jq -r .data[].hostname'
+  register: httpfs_url
+  run_once: true
+
+- name: "HTTPFS - Migrate back Configuration Files"
+  shell: "cp -ar /home/ /MEP-preparation/httpfs/tomcat/webapps/web.xml /opt/mapr/httpfs/*/share/hadoop/httpfs/tomcat/webapps/webhdfs/WEB-INF/"
+  when: inventory_hostname == httpfs_url.stdout
+
+- name: "Copy Configuration files of hbase /conf/ directory"
+  shell: "cp -ar /home/ /MEP-preparation/httpfs/tomcat/conf/server.xml /opt/mapr/httpfs/*/share/hadoop/httpfs/tomcat/conf/"
+  when: inventory_hostname == httpfs_url.stdout
+
+- name: "Copy Configuration files of hbase /conf/ directory"
+  shell: "cp -ar /home/ /MEP-preparation/httpfs/tomcat/conf/tomcat-users.xml /opt/mapr/httpfs/*/share/hadoop/httpfs/tomcat/conf/"
+  when: inventory_hostname == httpfs_url.stdout
+
+- name: "Copy Configuration files of hbase /conf/ directory"
+  shell: "cp -ar /home/ /MEP-preparation/httpfs/etc/httpfs-site.xml  /opt/mapr/httpfs/*/etc/hadoop/"
+  when: inventory_hostname == httpfs_url.stdout
+
+- name: "Restart HTTPFS Service"
+  shell: 'sudo su mapr -c "maprcli node services -name httpfs -action restart -filter csvc=="httpfs""'
+  run_once: true

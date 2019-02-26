@@ -1,0 +1,6 @@
+[preparation-hosts]
+xxxxx.net ansible_ssh_user=vpetrov ansible_become_method=su ansible_connection=ssh
+xxxxx.net ansible_ssh_user=vpetrov ansible_become_method=su ansible_connection=ssh
+xxxxx.net ansible_ssh_user=vpetrov ansible_become_method=su ansible_connection=ssh
+xxxxx.net ansible_ssh_user=vpetrov ansible_become_method=su ansible_connection=ssh
+

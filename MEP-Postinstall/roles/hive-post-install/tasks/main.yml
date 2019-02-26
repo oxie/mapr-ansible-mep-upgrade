@@ -1,0 +1,63 @@
+- name: "Registering MYSQL host from the hive-site.xml"
+  shell: "cat /opt/mapr/hive/*/conf/hive-site.xml | grep jdbc:mysql | cut -f3 -d: | cut -f3 -d/"
+  register: mysql_url
+
+- name: "Register Current Hive version"
+  shell: "ls -la /opt/mapr/hive/hive-*/ -d | awk '{ printf $9 }' | cut -f5 -d/"
+  register: hive_version
+
+- name: "Upgrading DB Schema because - Inconsistencies in the underlying database after creating tables with datanucleus.schema.autoCreateAll property."
+  shell: 'mysql -u{{mapr_mysql_user}} -p{{mapr_mysql_password}} -D hive -h {{mysql_url.stdout}} -e "SOURCE /opt/mapr/hive/hive-2.1/scripts/metastore/upgrade/mysql/hive-schema-0.13.0.mysql.sql;"'
+  when:
+    - hive_version.stdout == "hive-0.13"
+    - inventory_hostname == mysql_url.stdout
+  run_once: true
+
+- name: "Upgrading DB Schema because - Inconsistencies in the underlying database after creating tables with datanucleus.schema.autoCreateAll property."
+  shell: 'mysql -u{{mapr_mysql_user}} -p{{mapr_mysql_password}} -D hive -h {{mysql_url.stdout}} -e "SOURCE /opt/mapr/hive/hive-2.1/scripts/metastore/upgrade/mysql/hive-schema-0.14.0.mysql.sql;"'
+  when:
+    - hive_version.stdout == "hive-1.0"
+    - inventory_hostname == mysql_url.stdout
+  run_once: true
+
+- name: "Upgrading DB Schema because - Inconsistencies in the underlying database after creating tables with datanucleus.schema.autoCreateAll property."
+  shell: 'mysql -u{{mapr_mysql_user}} -p{{mapr_mysql_password}} -D hive -h {{mysql_url.stdout}} -e "SOURCE /opt/mapr/hive/hive-2.1/scripts/metastore/upgrade/mysql/hive-schema-1.2.0.mysql.sql;"'
+  when:
+    - hive_version.stdout == "hive-1.2"
+    - inventory_hostname == mysql_url.stdout
+  run_once: true
+
+- name: "Upgrading DB Schema 2nd query, because - Inconsistencies in the underlying database after creating tables with datanucleus.schema.autoCreateAll property."
+  shell: 'mysql -u{{mapr_mysql_user}} -p{{mapr_mysql_password}} -D hive -h {{mysql_url.stdout}} -e "SOURCE /opt/mapr/hive/hive-2.1/scripts/metastore/upgrade/mysql/hive-txn-schema-0.13.0.mysql.sql;"'
+  when:
+    - hive_version.stdout == "hive-1.2"
+    - inventory_hostname == mysql_url.stdout
+  run_once: true
+
+- name: "Upgrade the Hive Metastore Schema"
+  shell: "/opt/mapr/hive/hive-*/bin/schematool -dbType mysql -upgradeSchema"
+  when: inventory_hostname == mysql_url.stdout
+
+- name: "Upgrade configure.sh in order to make Warden recognize new updates"
+  shell: "/opt/mapr/server/configure.sh -R"
+
+ Restart HIVE-META
+- name: "Restart HiveMeta Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name hivemeta -action stop -filter csvc=="hivemeta""'
+  run_once: true
+
+ Restart HIVE-SERVER 
+- name: "Restart HiveServer2 Services across all nodes on cluster"
+  shell: 'sudo su mapr -c "maprcli node services -name hs2 -action stop -filter csvc=="hs2""'
+  run_once: true
+
+- name: "Verify Tables being Shown"
+  shell: 'mysql -u{{mapr_mysql_user}} -p{{mapr_mysql_password}} -D hive -h {{mysql_url.stdout}} -e "show tables;"'
+  when: inventory_hostname == mysql_url.stdout
+  register: mysql_table_output
+
+- name: debug
+  debug: msg="{{mysql_table_output}}"
+
+- pause:
+    prompt: "Please Reveiw the Table output and decide if its consistent"

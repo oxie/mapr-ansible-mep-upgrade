@@ -1,0 +1,31 @@
+# RedHat / CentOS
+- name: Create MapR Releases Repository for RedHat
+  yum_repository:
+    name: maprtech
+    description: MapR Technologies
+    file: external_repos
+    baseurl: "{{ mapr_release_url }}/redhat/"
+    gpgcheck: no
+    gpgkey: "{{ mapr_gpg_url }}"
+  when:
+    - ansible_os_family == 'RedHat'
+
+- name: Create MapR Ecosystem Repository for RedHat
+  yum_repository:
+    name: maprecosystem
+    description: MapR Technologies
+    file: external_repos
+    baseurl: "{{ mapr_ecosystem_url }}redhat/"
+    gpgcheck: no
+    gpgkey: "{{ mapr_gpg_url }}"
+  when:
+    - ansible_os_family == 'RedHat'
+
+
+- name: "Install JQ to make actuall checks for the host"
+  yum:
+    name: jq
+    state: present
+
+- name: "Mapr Login"
+  shell: 'sudo su mapr -c "echo {{ mapr_password }} | maprlogin password -user {{ mapr_user }}"'

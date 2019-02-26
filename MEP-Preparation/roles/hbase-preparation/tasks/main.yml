@@ -1,0 +1,28 @@
+- name: "Creating Required Directory Structure"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner:  
+    group:  
+    mode: 0775
+  with_items:
+    - /home/mapr/MEP-preparation/hbase/
+    - /home/mapr/MEP-preparation/hbase/volume_bak/
+    - /home/mapr/MEP-preparation/hbase/conf/
+
+#- name: "Creating mapr.hbase volume backup to /home/mapr/MEP-preparation/hbase/"
+#  shell: "sudo su mapr -c 'maprcli volume dump create -e /home/mapr/MEP-preparation/hbase/volume_bak/state-file -dumpfile /home/mapr/MEP-preparation/hbase/volume_bak/mapr.hbase.dump -name mapr.hbase'"
+#  ignore_errors: yes
+
+#Copy Configuration Files from /opt/mapr/hbase/<version>/conf/
+- name: "Copy Configuration files of hbase /conf/ directory"
+  shell: "cp -ar /opt/mapr/hbase/*/conf/*  /home/mapr/MEP-preparation/hbase/conf/"
+
+#Second step is to backup all config files
+- name: "Move the conf files to   folder"
+  shell: "mv -f /home/mapr/MEP-preparation/* /home/ /MEP-preparation/"
+  ignore_errors: yes
+
+- file:
+   path: /home/mapr/MEP-preparation/
+   state: absent

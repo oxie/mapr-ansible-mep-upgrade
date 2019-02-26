@@ -1,0 +1,25 @@
+- name: "Creating Required Directory Structure"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner:  
+    group:  
+    mode: 0775
+  with_items:
+    - /home/ /MEP-preparation/drill/
+    - /home/ /MEP-preparation/drill/plugin-conf/
+    - /home/ /MEP-preparation/drill/conf/
+
+- name: "Copy Configuration files of DRILL /conf/ directory"
+  shell: "cp -arf /opt/mapr/drill/*/conf/*  /home/ /MEP-preparation/drill/conf/"
+
+- name: "Getting Drill Plugin Configurations. Default plugins across the drill environments are - cp and dfs. Saving them to /home/ /MEP-Preparation/drill/{cp, dfs} "
+  shell: 'curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -k -c /home/ /MEP-preparation/drill/cookies.txt -s -d "j_username=mapr" -d "j_password=mapr" http://{{inventory_hostname}}:8047/j_security_check'
+
+- name: "Extracting Config Files for drill plugins"
+  shell: "curl 'http://{{inventory_hostname}}:8047/storage/{{ item }}.json' -k -b /home/ /MEP-preparation/drill/cookies.txt > /home/ /MEP-preparation/drill/plugin-conf/{{ item }}.json "
+  with_items:
+   - "dfs"
+   - "cp"
+   - "app"
+   - "hbase"
