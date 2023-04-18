@@ -26,9 +26,7 @@
 <br><br>
 ***!@/#/hosts/upgrade-hosts.yml***
 [upgrade-hosts]
- - mapr1-dev.neterra.skrill.net ansible_ssh_user={user} ansible_become_method=su ansible_connection=ssh
- - mapr2-dev.neterra.skrill.net ansible_ssh_user={user} ansible_become_method=su ansible_connection=ssh
- - mapr3-dev.neterra.skrill.net ansible_ssh_user={user} ansible_become_method=su ansible_connection=ssh
- - mapr4-dev.neterra.skrill.net ansible_ssh_user={user} ansible_become_method=su ansible_connection=ssh
+ - adress ansible_ssh_user={user} ansible_become_method=su ansible_connection=ssh
+ 
 
 
